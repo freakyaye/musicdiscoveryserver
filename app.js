@@ -11,6 +11,7 @@ require ('dotenv').config()
 const port = process.env.PORT
 const client_id = process.env.CLIENTID
 const client_secret = process.env.CLIENTSECRET
+const genre = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music"]
 const response_type = 'code'
 const redirect_uri = 'http://localhost:3000/callback'
 let access_token = null
@@ -146,6 +147,7 @@ function tracksMetadataApiCall (req, res, next) {
             trackName: item.name,
             trackId: item.id,
             popularity: item.popularity,
+            //genre: item.artists[0].genres,
             sample: item.preview_url,
             danceability: null,
             energy: null,
@@ -177,10 +179,177 @@ app.get('/mytoptracks', topTracksApiCall, tracksMetadataApiCall, (req, res, next
             'Authorization': 'Bearer ' + req.session.access_token
         }
     }).then(function (response) {
-        console.log(response.data.audio_features)
+        response.data.audio_features.forEach((item) => {
+            const currentItem = req.session.songArray.findIndex((element) => element.trackId === item.id)
+            req.session.songArray[currentItem].danceability = item.danceability
+            req.session.songArray[currentItem].energy = item.energy
+            req.session.songArray[currentItem].tempo = item.tempo
+            req.session.songArray[currentItem].valence = item.valence
+            req.session.songArray[currentItem].uri = item.uri
+
+        })
+        req.session.save(function (error){
+            if (error !== null) {
+                console.log(error)
+            }
+        })
+        res.send(req.session.songArray)
     })
-    res.send(req.session.topTrackswithMetaD)
+
     })
+
+app.get('/getrecommendations/:trackId', (req, res) => {
+    const trackId = req.params.trackId
+    const response = axios.get('https://api.spotify.com/v1/recommendations', {
+        params: {
+            'limit': '10',
+            'market': 'AU',
+            'seed_tracks': trackId
+        },
+        headers: {
+            'Authorization': 'Bearer ' + req.session.access_token
+        }
+    }).then((response) => {
+        const songArray = []
+        response.data.tracks.forEach((item) => {
+            const songData = {
+                artwork: item.album.images[2].url,
+                albumName: item.album.name,
+                artistName: item.artists[0].name,
+                trackName: item.name,
+                trackId: item.id,
+                popularity: item.popularity,
+                sample: item.preview_url,
+                danceability: null,
+                energy: null,
+                valence: null,
+                tempo: null,
+                uri: null
+            }
+            songArray.push((songData))
+        })
+        const trackIdsArray = []
+        songArray.forEach((item) => {
+            trackIdsArray.push(item.trackId)
+        })
+        const response2 = axios.get('https://api.spotify.com/v1/audio-features', {
+            params: {
+                'ids': trackIdsArray.toString()
+            },
+            headers: {
+                'Authorization': 'Bearer ' + req.session.access_token
+            }
+        }).then(function (response2) {
+            response2.data.audio_features.forEach((item) => {
+                const currentItem = songArray.findIndex((element) => element.trackId === item.id)
+                songArray[currentItem].danceability = item.danceability
+                songArray[currentItem].energy = item.energy
+                songArray[currentItem].tempo = item.tempo
+                songArray[currentItem].valence = item.valence
+                songArray[currentItem].uri = item.uri
+
+            })
+            res.send(songArray)
+            req.session.save(function (error) {
+                if (error !== null) {
+                    console.log(error)
+                }
+            })
+        }).catch(function (error) {
+            console.log(error.data)
+        })
+    })
+})
+
+const genreOK = function (value) {
+    if (genre.includes(value)) {
+        return true
+    } else {
+        return false
+    }
+}
+
+app.get('/advancedsearch', (req, res) => {
+    if (req.query.valence === null &&
+        req.query.danceability === null &&
+        req.query.energy === null &&
+        req.query.popularity === null &&
+        req.query.tempo === null)
+    {
+        res.status(400).send('Bad Request')
+        console.log('Bad request')
+    } else if (genreOK(req.query.genre) === false) {
+        res.status(400).send('Bad genre')
+        console.log('Bad genre')
+    } else {
+        const danceability = req.query.danceability
+        const energy = req.query.energy
+        const tempo = req.query.tempo
+        const valence = req.query.valence
+        const genre = req.query.genre
+        const popularity = req.query.popularity
+        const response = axios.get('https://api.spotify.com/v1/recommendations', {
+            params: {
+                'limit': '10',
+                'market': 'AU',
+                'target_danceability': danceability,
+                'target_valence': valence,
+                'target_energy': energy,
+                'target_tempo': tempo,
+                'seed_genres': genre,
+                'target_popularity': popularity
+            },
+            headers: {
+                'Authorization': 'Bearer ' + req.session.access_token
+            }
+    }).then((response) => {
+                const songArray = []
+                response.data.tracks.forEach((item) => {
+                    const songData = {
+                        artwork: item.album.images[2].url,
+                        albumName: item.album.name,
+                        artistName: item.artists[0].name,
+                        trackName: item.name,
+                        trackId: item.id,
+                        popularity: item.popularity,
+                        sample: item.preview_url,
+                        danceability: null,
+                        energy: null,
+                        valence: null,
+                        tempo: null,
+                        uri: null
+                    }
+                    songArray.push((songData))
+                })
+            const trackIdsArray = []
+            songArray.forEach((item) => {
+                trackIdsArray.push(item.trackId)
+            })
+            const response2 = axios.get('https://api.spotify.com/v1/audio-features', {
+                params: {
+                    'ids': trackIdsArray.toString()
+                },
+                headers: {
+                    'Authorization': 'Bearer ' + req.session.access_token
+                }
+            }).then(function (response2) {
+                    response2.data.audio_features.forEach((item) => {
+                        const currentItem = songArray.findIndex((element) => element.trackId === item.id)
+                        songArray[currentItem].danceability = item.danceability
+                        songArray[currentItem].energy = item.energy
+                        songArray[currentItem].tempo = item.tempo
+                        songArray[currentItem].valence = item.valence
+                        songArray[currentItem].uri = item.uri
+
+                    })
+                res.send(songArray)
+    }).catch(function (error) {
+            console.log(error.data)
+        })
+
+
+})
+}})
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
