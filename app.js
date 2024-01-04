@@ -6,6 +6,7 @@ const querystring = require("querystring");
 const cors = require('cors')
 const sqlite = require("better-sqlite3")
 const session = require("express-session")
+const stateStore = require('store2')
 const SqliteStore = require("better-sqlite3-session-store")(session)
 const db = new sqlite("sessions.db", {})
 require ('dotenv').config()
@@ -14,7 +15,7 @@ const client_id = process.env.CLIENTID
 const client_secret = process.env.CLIENTSECRET
 const genre = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music"]
 const response_type = 'code'
-const redirect_uri = 'http://localhost:4000/callback'
+const redirect_uri = 'http://localhost:3000/callback'
 let access_token = null
 const token_type = 'Bearer'
 const accessTokenStartTime = null
@@ -31,6 +32,9 @@ app.use(cors({
     origin: ['http://localhost:3000', '*']
 }))
 
+app.use(express.urlencoded())
+app.use(express.json())
+
 app.use(session({
     genid: function () {
         return crypto.randomUUID()
@@ -43,7 +47,7 @@ app.use(session({
         }
     }),
     secret: process.env.SESSIONSECRET,
-    resave: false,
+    resave: true,
     cookie: {
         secure: secureEnv(),
         path: '/',
@@ -66,29 +70,28 @@ app.get('/login', (req, res) => {
     const scope = 'user-top-read'
 
     const calculateState = crypto.randomBytes(16).toString('hex')
-    req.session.state = calculateState
+    stateStore('state', calculateState)
+
+    req.session.save(function (error){
+        if (error !== null) {
+            console.log(error.data)
+        }
+    })
 
     res.redirect('https://accounts.spotify.com/authorize?' + querystring.stringify({
         client_id: client_id,
         response_type: response_type,
         scope: scope,
         redirect_uri: redirect_uri,
-        state: req.session.state
+        state: stateStore('state')
     }))
 })
 
-app.get('/error', (req, res) => {
-    res.send('error')
-})
-
-app.get('/callback', (req, res) => {
-    const code = req.query.code || null
-    const returnedState = req.query.state || null
-
-    if (returnedState !== req.session.state) {
-        res.redirect('/error?' + querystring.stringify({
-            error: 'state_error'
-        }))
+app.post('/login', (req, res) => {
+    const code = req.body.code || null
+    const returnedState = req.body.state || null
+    if (returnedState !== stateStore('state')) {
+        console.log('state error')
     } else {
         const authorisationString = new Buffer.from(client_id + ':' + client_secret).toString('base64')
         const optionsObject = {
@@ -100,26 +103,75 @@ app.get('/callback', (req, res) => {
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
                 'authorization': 'Basic ' + authorisationString
-        }}
+            }}
         const response = axios.post('https://accounts.spotify.com/api/token',
             optionsObject,
             axiosConfig).then(function (response) {
-            req.session.access_token = response.data.access_token
-            req.session.refresh_token = response.data.refresh_token
+            stateStore('access_token', response.data.access_token)
+            stateStore('refresh_token', response.data.refresh_token)
             req.session.save(function (error){
                 if (error !== null) {
                     console.log(error.data)
                 }
             })
-            // res.send('callback successful')
-            res.redirect('http://localhost:3000/')
+            console.log('callback successful')
         }).catch(function (error) {
             console.log(error.data)
         })
     }
+
+    req.session.save(function (error){
+        if (error !== null) {
+            console.log(error.data)
+        }
+    })
+    res.status(200).send()
 })
 
+app.get('/error', (req, res) => {
+    res.send('error')
+})
+
+// app.get('/callback', (req, res) => {
+//     const code = req.query.code || null
+//     const returnedState = req.query.state || null
+//
+//     if (returnedState !== req.session.state) {
+//         res.redirect('/error?' + querystring.stringify({
+//             error: 'state_error'
+//         }))
+//     } else {
+//         const authorisationString = new Buffer.from(client_id + ':' + client_secret).toString('base64')
+//         const optionsObject = {
+//             code: code,
+//             redirect_uri: redirect_uri,
+//             grant_type: 'authorization_code'
+//         }
+//         const axiosConfig = {
+//             headers: {
+//                 'content-type': 'application/x-www-form-urlencoded',
+//                 'authorization': 'Basic ' + authorisationString
+//         }}
+//         const response = axios.post('https://accounts.spotify.com/api/token',
+//             optionsObject,
+//             axiosConfig).then(function (response) {
+//             req.session.access_token = response.data.access_token
+//             req.session.refresh_token = response.data.refresh_token
+//             req.session.save(function (error){
+//                 if (error !== null) {
+//                     console.log(error.data)
+//                 }
+//             })
+//             console.log('callback successful')
+//             console.log(req.session.access_token)
+//         }).catch(function (error) {
+//             console.log(error.data)
+//         })
+//     }
+// })
+
 function topTracksApiCall (req, res, next) {
+    console.log('starting toptracks api call')
     const response = axios.get('https://api.spotify.com/v1/me/top/tracks', {
         params: {
             'time_range': 'medium_term',
@@ -127,15 +179,18 @@ function topTracksApiCall (req, res, next) {
             'offset': '0'
         },
         headers: {
-            'Authorization': 'Bearer ' + req.session.access_token
+            'Authorization': 'Bearer ' + stateStore('access_token')
         }
     }).then(function (response) {
         req.session.topTracks = response.data.items
         req.session.save(function (error){
             if (error !== null) {
                 console.log(error.data)
+                console.log('error in save')
             }
         })
+
+        console.log('toptracks api call done')
         next()
     }).catch(function (error) {
         console.log(error.data)
@@ -164,6 +219,7 @@ function tracksMetadataApiCall (req, res, next) {
         songArray.push(songData)
     })
     req.session.songArray = songArray
+    console.log('tracks metadata call done')
     req.session.save(function (error){
         if (error !== null) {
             console.log(error.data)
@@ -182,7 +238,7 @@ app.get('/mytoptracks', topTracksApiCall, tracksMetadataApiCall, (req, res, next
             'ids': trackIdsArray.toString()
         },
         headers: {
-            'Authorization': 'Bearer ' + req.session.access_token
+            'Authorization': 'Bearer ' + stateStore('access_token')
         }
     }).then(function (response) {
         response.data.audio_features.forEach((item) => {
@@ -199,7 +255,11 @@ app.get('/mytoptracks', topTracksApiCall, tracksMetadataApiCall, (req, res, next
                 console.log(error.data)
             }
         })
-        res.send(req.session.songArray)
+        console.log(req.session.songArray)
+        try {
+        res.send(req.session.songArray) } catch (e) {
+            console.log(e)
+        }
     })
 
     })
@@ -213,7 +273,7 @@ app.get('/getrecommendations/:trackId', (req, res) => {
             'seed_tracks': trackId
         },
         headers: {
-            'Authorization': 'Bearer ' + req.session.access_token
+            'Authorization': 'Bearer ' + stateStore('access_token')
         }
     }).then((response) => {
         const songArray = []
@@ -243,7 +303,7 @@ app.get('/getrecommendations/:trackId', (req, res) => {
                 'ids': trackIdsArray.toString()
             },
             headers: {
-                'Authorization': 'Bearer ' + req.session.access_token
+                'Authorization': 'Bearer ' + stateStore('access_token')
             }
         }).then(function (response2) {
             response2.data.audio_features.forEach((item) => {
@@ -306,7 +366,7 @@ app.get('/advancedsearch', (req, res) => {
                 'target_popularity': popularity
             },
             headers: {
-                'Authorization': 'Bearer ' + req.session.access_token
+                'Authorization': 'Bearer ' + stateStore('access_token')
             }
     }).then((response) => {
                 const songArray = []
@@ -336,7 +396,7 @@ app.get('/advancedsearch', (req, res) => {
                     'ids': trackIdsArray.toString()
                 },
                 headers: {
-                    'Authorization': 'Bearer ' + req.session.access_token
+                    'Authorization': 'Bearer ' + stateStore('access_token')
                 }
             }).then(function (response2) {
                     response2.data.audio_features.forEach((item) => {
@@ -371,7 +431,7 @@ app.get('/songsearch', (req, res) => {
                 'type': 'track'
             },
             headers: {
-                'Authorization': 'Bearer ' + req.session.access_token
+                'Authorization': 'Bearer ' + stateStore('access_token')
             }
         }).then((response) => {
             const songArray = []
@@ -401,7 +461,7 @@ app.get('/songsearch', (req, res) => {
                     'ids': trackIdsArray.toString()
                 },
                 headers: {
-                    'Authorization': 'Bearer ' + req.session.access_token
+                    'Authorization': 'Bearer ' + stateStore('access_token')
                 }
             }).then(function (response2) {
                 response2.data.audio_features.forEach((item) => {
@@ -435,6 +495,14 @@ app.get('/logout', (req, res) => {
         }
     })
 })
+
+app.get('/testroute', (req, res) => {
+    // console.log(req.session.access_token)
+    // console.log(req.session.state)
+    console.log(stateStore('access_token'))
+    console.log(stateStore('state'))
+    console.log(stateStore('refresh_token'))
+}   )
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
