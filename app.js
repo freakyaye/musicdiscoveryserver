@@ -202,7 +202,7 @@ function tracksMetadataApiCall (req, res, next) {
     const songArray = []
     req.session.topTracks.forEach((item) => {
         const songData = {
-            artwork: item.album.images[2].url,
+            artwork: item.album.images[1].url,
             albumName: item.album.name,
             artistName: item.artists[0].name,
             trackName: item.name,
@@ -279,7 +279,7 @@ app.get('/getrecommendations/:trackId', (req, res) => {
         const songArray = []
         response.data.tracks.forEach((item) => {
             const songData = {
-                artwork: item.album.images[2].url,
+                artwork: item.album.images[1].url,
                 albumName: item.album.name,
                 artistName: item.artists[0].name,
                 trackName: item.name,
@@ -372,7 +372,7 @@ app.get('/advancedsearch', (req, res) => {
                 const songArray = []
                 response.data.tracks.forEach((item) => {
                     const songData = {
-                        artwork: item.album.images[2].url,
+                        artwork: item.album.images[1].url,
                         albumName: item.album.name,
                         artistName: item.artists[0].name,
                         trackName: item.name,
@@ -437,7 +437,7 @@ app.get('/songsearch', (req, res) => {
             const songArray = []
             response.data.tracks.items.forEach((item) => {
                 const songData = {
-                    artwork: item.album.images[2].url,
+                    artwork: item.album.images[1].url,
                     albumName: item.album.name,
                     artistName: item.artists[0].name,
                     trackName: item.name,
