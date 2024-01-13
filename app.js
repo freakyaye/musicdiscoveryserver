@@ -7,6 +7,7 @@ const cors = require('cors')
 const sqlite = require("better-sqlite3")
 const session = require("express-session")
 const stateStore = require('store2')
+const {data, toJSON} = require("express-session/session/cookie");
 const SqliteStore = require("better-sqlite3-session-store")(session)
 const db = new sqlite("sessions.db", {})
 require ('dotenv').config()
@@ -67,7 +68,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-    const scope = 'user-top-read'
+    const scope = 'user-top-read playlist-modify-private'
 
     const calculateState = crypto.randomBytes(16).toString('hex')
     stateStore('state', calculateState)
@@ -481,17 +482,58 @@ app.get('/songsearch', (req, res) => {
 })
 
 app.post('/saveplaylist', (req, res) => {
-    if (req.body.playlistName !== null) {
+    if (req.body.playlistName !== null && req.body.songsToAdd.length !== 0) {
 
-    }
-})
+        const response = axios.get('https://api.spotify.com/v1/me', {
+            headers: {
+                'Authorization': 'Bearer ' + stateStore('access_token')
+            }
+        }).then((data) => {
+            stateStore('userID', data.data.id)
+        }).then(async() => {
+            const response2 = await axios.post(`https://api.spotify.com/v1/users/${stateStore('userID')}/playlists`, {
+                'name': req.body.playlistName,
+                'description': '',
+                'public': 'false'
+            },
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + stateStore('access_token'),
+                        'Content-type': 'application/json'
+                }
+            }
+            )
+            const id = await response2.data.id
+            stateStore('newPlaylistID', id)
+        }).then(() => {
+            const json = JSON.stringify({uris:
+                req.body.songsToAdd})
+            // console.log(json)
+            const response = axios.post(`https://api.spotify.com/v1/playlists/${stateStore('newPlaylistID')}/tracks`,
+                     json
+                ,
+                {
+                    headers: {
+                        'Authorization': 'Bearer ' + stateStore('access_token'),
+                        'Content-type': 'application/json'
+                    }
+                })
+        })
+            .then(() => {
+            res.status(200).send()
+        })
+            .catch((e) => {
+            console.log(e.error)
+        })
+
+}})
 
 app.get('/logout', (req, res) => {
     req.session.destroy(function (error) {
         if (error !== null) {
             console.log(error)
         } else {
-            res.send('logged out')
+            res.status(200).send()
         }
     })
 })
