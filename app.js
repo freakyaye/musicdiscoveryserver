@@ -265,13 +265,13 @@ app.get('/mytoptracks', topTracksApiCall, tracksMetadataApiCall, (req, res, next
 
     })
 
-app.get('/getrecommendations/:trackId', (req, res) => {
-    const trackId = req.params.trackId
+app.get('/getrecommendations', (req, res) => {
+    const trackId = req.query.trackid
     const response = axios.get('https://api.spotify.com/v1/recommendations', {
         params: {
-            'limit': '10',
-            'market': 'AU',
-            'seed_tracks': trackId
+            limit: '10',
+            market: 'AU',
+            seed_tracks: trackId
         },
         headers: {
             'Authorization': 'Bearer ' + stateStore('access_token')
@@ -325,6 +325,9 @@ app.get('/getrecommendations/:trackId', (req, res) => {
         }).catch(function (error) {
             console.log(error.data)
         })
+    }).catch(error => {
+        console.log(error.message)
+        // res.status(400).send(error.error.message)
     })
 })
 
@@ -345,7 +348,7 @@ app.get('/advancedsearch', (req, res) => {
     {
         res.status(400).send('Bad Request')
         console.log('Bad request')
-    } else if (genreOK(req.query.genre) === false) {
+    } else if (genreOK(req.query.genreChoice) === false) {
         res.status(400).send('Bad genre')
         console.log('Bad genre')
     } else {
@@ -353,18 +356,18 @@ app.get('/advancedsearch', (req, res) => {
         const energy = req.query.energy
         const tempo = req.query.tempo
         const valence = req.query.valence
-        const genre = req.query.genre
+        const genre = req.query.genreChoice
         const popularity = req.query.popularity
         const response = axios.get('https://api.spotify.com/v1/recommendations', {
             params: {
-                'limit': '10',
-                'market': 'AU',
-                'target_danceability': danceability,
-                'target_valence': valence,
-                'target_energy': energy,
-                'target_tempo': tempo,
-                'seed_genres': genre,
-                'target_popularity': popularity
+                limit: '10',
+                market: 'AU',
+                target_danceability: req.query.danceability,
+                target_valence: req.query.energy,
+                target_energy: req.query.tempo,
+                target_tempo: req.query.valence,
+                seed_genres: req.query.genreChoice,
+                target_popularity: req.query.popularity
             },
             headers: {
                 'Authorization': 'Bearer ' + stateStore('access_token')
@@ -411,7 +414,7 @@ app.get('/advancedsearch', (req, res) => {
                     })
                 res.send(songArray)
     }).catch(function (error) {
-            console.log(error.data)
+            console.log(error.message)
         })
 
 
@@ -422,7 +425,7 @@ app.get('/songsearch', (req, res) => {
     if (req.query.song === null) {
         res.status(401).send('Include song title')
     } else {
-        const song = req.query.song
+        const song = req.query.song.slice(0, 50)
         const response = axios.get('https://api.spotify.com/v1/search', {
             params: {
                 'q': song,
@@ -434,8 +437,12 @@ app.get('/songsearch', (req, res) => {
             headers: {
                 'Authorization': 'Bearer ' + stateStore('access_token')
             }
-        }).then((response) => {
+        })
+            .then((response) => {
             const songArray = []
+                if (response.data.tracks.total === 0) {
+                    res.status(204).send()
+                } else {
             response.data.tracks.items.forEach((item) => {
                 const songData = {
                     artwork: item.album.images[1].url,
@@ -476,8 +483,10 @@ app.get('/songsearch', (req, res) => {
                 })
                 res.send(songArray)
         }).catch((error) => {
-            console.log(error.data)
+            console.log(error.message)
         })
+                }
+
     })}
 })
 
@@ -518,6 +527,8 @@ app.post('/saveplaylist', (req, res) => {
                         'Content-type': 'application/json'
                     }
                 })
+        }).catch(e => {
+            console.log(e.message)
         })
             .then(() => {
             res.status(200).send()
