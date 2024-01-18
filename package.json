@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "build": "webpack --node production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Joel Styles",
