@@ -1,5 +1,5 @@
 {
-  "name": "spotifysearcher",
+  "name": "musicdiscoveryserver",
   "version": "1.0.0",
   "description": "A tool to allow advanced searches of the Spotify API",
   "main": "app.js",

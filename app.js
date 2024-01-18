@@ -34,7 +34,7 @@ const secureEnv = function () {
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
-            'img-src': ["'self'", data, "https://i.scdn.co"]
+            'img-src': ["'self'", "https://i.scdn.co", "https data:"]
         }
     }
 }))
@@ -192,6 +192,9 @@ function topTracksApiCall (req, res, next) {
             'Authorization': 'Bearer ' + req.session.access_token
         }
     }).then(function (response) {
+        if (response.data.items === undefined || response.data.items === null || response.data.total === 0) {
+            res.status(404).send()
+        } else {
         req.session.topTracks = response.data.items
         req.session.save(function (error){
             if (error !== null) {
@@ -200,6 +203,7 @@ function topTracksApiCall (req, res, next) {
         })
 
         next()
+    }
     }).catch(function (error) {
         console.log(error.data)
     })
@@ -236,7 +240,10 @@ function tracksMetadataApiCall (req, res, next) {
 
 app.get('/mytoptracks', validAccessToken, topTracksApiCall, tracksMetadataApiCall, (req, res, next) => {
     const trackIdsArray = []
-    req.session.songArray.forEach((item) => {
+    if (req.session.songArray === undefined || req.session.songArray === null) {
+        res.status(404).send()
+    } else {
+    req.session.songArray?.forEach((item) => {
         trackIdsArray.push(item.trackId)
     })
     const response = axios.get('https://api.spotify.com/v1/audio-features', {
@@ -249,11 +256,11 @@ app.get('/mytoptracks', validAccessToken, topTracksApiCall, tracksMetadataApiCal
     }).then(function (response) {
         response.data.audio_features.forEach((item) => {
             const currentItem = req.session.songArray.findIndex((element) => element.trackId === item.id)
-            req.session.songArray[currentItem].danceability = item.danceability
-            req.session.songArray[currentItem].energy = item.energy
-            req.session.songArray[currentItem].tempo = item.tempo
-            req.session.songArray[currentItem].valence = item.valence
-            req.session.songArray[currentItem].uri = item.uri
+            req.session.songArray[currentItem].danceability = item?.danceability ?? 0
+            req.session.songArray[currentItem].energy = item?.energy ?? 0
+            req.session.songArray[currentItem].tempo = item?.tempo ?? 0
+            req.session.songArray[currentItem].valence = item?.valence ?? 0
+            req.session.songArray[currentItem].uri = item?.uri ?? 0
 
         })
         req.session.save(function (error){
@@ -266,6 +273,7 @@ app.get('/mytoptracks', validAccessToken, topTracksApiCall, tracksMetadataApiCal
             console.log(e)
         }
     })
+}
 
     })
 
@@ -313,11 +321,11 @@ app.get('/getrecommendations', validAccessToken, (req, res) => {
         }).then(function (response2) {
             response2.data.audio_features.forEach((item) => {
                 const currentItem = songArray.findIndex((element) => element.trackId === item.id)
-                songArray[currentItem].danceability = item.danceability
-                songArray[currentItem].energy = item.energy
-                songArray[currentItem].tempo = item.tempo
-                songArray[currentItem].valence = item.valence
-                songArray[currentItem].uri = item.uri
+                songArray[currentItem].danceability = item?.danceability ?? 0
+                songArray[currentItem].energy = item?.energy ?? 0
+                songArray[currentItem].tempo = item?.tempo ?? 0
+                songArray[currentItem].valence = item?.valence ?? 0
+                songArray[currentItem].uri = item?.uri ?? 0
 
             })
             res.send(songArray)
@@ -355,92 +363,46 @@ app.get('/advancedsearch', validAccessToken, (req, res) => {
         res.status(400).send('Bad genre')
         console.log('Bad genre')
     } else {
+        const danceability = (() => {
+            if (!isNaN(req.query.danceability / 100)) {
+                return req.query.danceability / 100
+            }
+            {
+                return undefined
+            }
+        })
+        const valence = (() => {
+            if (!isNaN(req.query.valence / 100)) {
+                return req.query.valence / 100
+            }
+            {
+                return undefined
+            }
+        })
+        const energy = (() => {
+            if (!isNaN(req.query.energy / 100)) {
+                return req.query.energy / 100
+            } else {
+                return undefined
+            }
+        })
         const response = axios.get('https://api.spotify.com/v1/recommendations', {
             params: {
                 limit: '10',
                 market: 'AU',
-                target_danceability: req.query.danceability,
-                target_valence: req.query.energy,
-                target_energy: req.query.tempo,
-                target_tempo: req.query.valence,
+                target_danceability: danceability(),
+                target_valence: valence(),
+                target_energy: energy(),
+                target_tempo: req.query.tempo,
                 seed_genres: req.query.genreChoice,
                 target_popularity: req.query.popularity
             },
             headers: {
                 'Authorization': 'Bearer ' + req.session.access_token
             }
-    }).then((response) => {
-                const songArray = []
-                response.data.tracks.forEach((item) => {
-                    const songData = {
-                        artwork: item.album.images[1].url,
-                        albumName: item.album.name,
-                        artistName: item.artists[0].name,
-                        trackName: item.name,
-                        trackId: item.id,
-                        popularity: item.popularity,
-                        sample: item.preview_url,
-                        danceability: null,
-                        energy: null,
-                        valence: null,
-                        tempo: null,
-                        uri: null
-                    }
-                    songArray.push((songData))
-                })
-            const trackIdsArray = []
-            songArray.forEach((item) => {
-                trackIdsArray.push(item.trackId)
-            })
-            const response2 = axios.get('https://api.spotify.com/v1/audio-features', {
-                params: {
-                    'ids': trackIdsArray.toString()
-                },
-                headers: {
-                    'Authorization': 'Bearer ' + req.session.access_token
-                }
-            }).then(function (response2) {
-                    response2.data.audio_features.forEach((item) => {
-                        const currentItem = songArray.findIndex((element) => element.trackId === item.id)
-                        songArray[currentItem].danceability = item.danceability
-                        songArray[currentItem].energy = item.energy
-                        songArray[currentItem].tempo = item.tempo
-                        songArray[currentItem].valence = item.valence
-                        songArray[currentItem].uri = item.uri
-
-                    })
-                res.send(songArray)
-    }).catch(function (error) {
-            console.log(error.message)
-        })
-
-
-})
-}})
-
-app.get('/songsearch', validAccessToken, (req, res) => {
-    if (req.query.song === null) {
-        res.status(401).send('Include song title')
-    } else {
-        const song = req.query.song.slice(0, 50)
-        const response = axios.get('https://api.spotify.com/v1/search', {
-            params: {
-                'q': song,
-                'market': 'AU',
-                'limit': '10',
-                'offset': '0',
-                'type': 'track'
-            },
-            headers: {
-                'Authorization': 'Bearer ' + req.session.access_token
-            }
-        })
-            .then((response) => {
+        }).then((response) => {
             const songArray = []
-                if (response.data.tracks.total === 0) {
-                    res.status(204).send()
-                } else {
-            response.data.tracks.items.forEach((item) => {
+            response.data.tracks.forEach((item) => {
                 const songData = {
                     artwork: item.album.images[1].url,
                     albumName: item.album.name,
@@ -471,76 +433,146 @@ app.get('/songsearch', validAccessToken, (req, res) => {
             }).then(function (response2) {
                 response2.data.audio_features.forEach((item) => {
                     const currentItem = songArray.findIndex((element) => element.trackId === item.id)
-                    songArray[currentItem].danceability = item.danceability
-                    songArray[currentItem].energy = item.energy
-                    songArray[currentItem].tempo = item.tempo
-                    songArray[currentItem].valence = item.valence
-                    songArray[currentItem].uri = item.uri
+                    songArray[currentItem].danceability = item?.danceability ?? 0
+                    songArray[currentItem].energy = item?.energy ?? 0
+                    songArray[currentItem].tempo = item?.tempo ?? 0
+                    songArray[currentItem].valence = item?.valence ?? 0
+                    songArray[currentItem].uri = item?.uri ?? 0
 
                 })
                 res.send(songArray)
-        }).catch((error) => {
-            console.log(error.message)
-        })
-                }
+            }).catch(function (error) {
+                console.log(error.message)
+            })
+        })}})
 
-    })}
-})
-
-app.post('/saveplaylist', validAccessToken, (req, res) => {
-    if (req.body.playlistName !== null && req.body.songsToAdd.length !== 0) {
-
-        const response = axios.get('https://api.spotify.com/v1/me', {
-            headers: {
-                'Authorization': 'Bearer ' + req.session.access_token
-            }
-        }).then((data) => {
-            stateStore('userID', data.data.id)
-        }).then(async() => {
-            const response2 = await axios.post(`https://api.spotify.com/v1/users/${stateStore('userID')}/playlists`, {
-                'name': req.body.playlistName,
-                'description': '',
-                'public': 'false'
-            },
-            {
-                headers: {
-                    'Authorization': 'Bearer ' + req.session.access_token,
-                        'Content-type': 'application/json'
-                }
-            }
-            )
-            const id = await response2.data.id
-            stateStore('newPlaylistID', id)
-        }).then(() => {
-            const json = JSON.stringify({uris:
-                req.body.songsToAdd})
-            const response = axios.post(`https://api.spotify.com/v1/playlists/${stateStore('newPlaylistID')}/tracks`,
-                     json
-                ,
-                {
+        app.get('/songsearch', validAccessToken, (req, res) => {
+            if (req.query.song === null) {
+                res.status(401).send('Include song title')
+            } else {
+                const song = req.query.song.slice(0, 50)
+                const response = axios.get('https://api.spotify.com/v1/search', {
+                    params: {
+                        'q': song,
+                        'market': 'AU',
+                        'limit': '10',
+                        'offset': '0',
+                        'type': 'track'
+                    },
                     headers: {
-                        'Authorization': 'Bearer ' + req.session.access_token,
-                        'Content-type': 'application/json'
+                        'Authorization': 'Bearer ' + req.session.access_token
                     }
                 })
-        }).catch(e => {
-            console.log(e.message)
+                    .then((response) => {
+                        const songArray = []
+                        if (response.data.tracks.total === 0) {
+                            res.status(204).send()
+                        } else {
+                            response.data.tracks.items.forEach((item) => {
+                                const songData = {
+                                    artwork: item.album.images[1].url,
+                                    albumName: item.album.name,
+                                    artistName: item.artists[0].name,
+                                    trackName: item.name,
+                                    trackId: item.id,
+                                    popularity: item.popularity,
+                                    sample: item.preview_url,
+                                    danceability: null,
+                                    energy: null,
+                                    valence: null,
+                                    tempo: null,
+                                    uri: null
+                                }
+                                songArray.push((songData))
+                            })
+                            const trackIdsArray = []
+                            songArray.forEach((item) => {
+                                trackIdsArray.push(item.trackId)
+                            })
+                            const response2 = axios.get('https://api.spotify.com/v1/audio-features', {
+                                params: {
+                                    'ids': trackIdsArray.toString()
+                                },
+                                headers: {
+                                    'Authorization': 'Bearer ' + req.session.access_token
+                                }
+                            }).then(function (response2) {
+                                response2.data.audio_features.forEach((item) => {
+                                    const currentItem = songArray.findIndex((element) => element.trackId === item.id)
+                                    songArray[currentItem].danceability = item?.danceability ?? 0
+                                    songArray[currentItem].energy = item?.energy ?? 0
+                                    songArray[currentItem].tempo = item?.tempo ?? 0
+                                    songArray[currentItem].valence = item?.valence ?? 0
+                                    songArray[currentItem].uri = item?.uri ?? 0
+
+                                })
+                                res.send(songArray)
+                            }).catch((error) => {
+                                console.log(error.message)
+                            })
+                        }
+
+                    })
+            }
         })
-            .then(() => {
+
+        app.post('/saveplaylist', validAccessToken, (req, res) => {
+            if (req.body.playlistName !== null && req.body.songsToAdd.length !== 0) {
+                const songsToAddShort = req.body.songsToAdd.slice(0, 99)
+                const response = axios.get('https://api.spotify.com/v1/me', {
+                    headers: {
+                        'Authorization': 'Bearer ' + req.session.access_token
+                    }
+                }).then((data) => {
+                    stateStore('userID', data.data.id)
+                }).then(async () => {
+                    const response2 = await axios.post(`https://api.spotify.com/v1/users/${stateStore('userID')}/playlists`, {
+                            'name': req.body.playlistName,
+                            'description': '',
+                            'public': 'false'
+                        },
+                        {
+                            headers: {
+                                'Authorization': 'Bearer ' + req.session.access_token,
+                                'Content-type': 'application/json'
+                            }
+                        }
+                    )
+                    const id = await response2.data.id
+                    stateStore('newPlaylistID', id)
+                }).then(() => {
+                    const json = JSON.stringify({
+                        uris:
+                        songsToAddShort
+                    })
+                    const response = axios.post(`https://api.spotify.com/v1/playlists/${stateStore('newPlaylistID')}/tracks`,
+                        json
+                        ,
+                        {
+                            headers: {
+                                'Authorization': 'Bearer ' + req.session.access_token,
+                                'Content-type': 'application/json'
+                            }
+                        })
+                }).catch(e => {
+                    console.log(e.message)
+                })
+                    .then(() => {
+                        res.status(200).send()
+                    })
+                    .catch((e) => {
+                        console.log(e.error)
+                    })
+
+            }
+        })
+
+        app.get('/logout', (req, res) => {
+            req.session.destroy(() => {
+            })
             res.status(200).send()
         })
-            .catch((e) => {
-            console.log(e.error)
+
+        app.listen(port, () => {
+            console.log(`Example app listening on port ${port}`)
         })
-
-}})
-
-app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
-    })
-    res.status(200).send()
-})
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
