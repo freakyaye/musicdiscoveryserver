@@ -5,7 +5,6 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "build": "webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Joel Styles",
@@ -23,6 +22,10 @@
     "helmut": "^1.0.1",
     "node-fetch": "^3.3.2",
     "serve-static": "^1.15.0",
-    "store2": "^2.14.2"
+    "store2": "^2.14.2",
+    "webpack": "^5.89.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^5.1.4"
   }
 }
