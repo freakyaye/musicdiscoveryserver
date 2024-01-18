@@ -19,13 +19,11 @@
     "express-session": "^1.17.3",
     "express-state": "^2.0.0",
     "helmet": "^7.1.0",
-    "helmut": "^1.0.1",
     "node-fetch": "^3.3.2",
     "serve-static": "^1.15.0",
-    "store2": "^2.14.2",
-    "webpack": "^5.89.0"
+    "store2": "^2.14.2"
   },
   "devDependencies": {
-    "webpack-cli": "^5.1.4"
+
   }
 }
