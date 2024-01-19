@@ -23,6 +23,7 @@ const response_type = 'code'
 const redirect_uri = process.env.REDIRECT_URI
 const token_type = 'Bearer'
 
+
 const secureEnv = function () {
     if (app.get('env') === 'production') {
         return true

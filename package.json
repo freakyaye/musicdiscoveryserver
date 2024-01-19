@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-"build": "npm ci --omit=dev",
+    "build": "npm ci --omit=dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Joel Styles",
@@ -23,8 +23,5 @@
     "node-fetch": "^3.3.2",
     "serve-static": "^1.15.0",
     "store2": "^2.14.2"
-  },
-  "devDependencies": {
-
   }
 }
