@@ -165,6 +165,9 @@ app.get('/callback', (req, res) => {
         const response = axios.post('https://accounts.spotify.com/api/token',
             optionsObject,
             axiosConfig).then(function (response) {
+                if (response !== 200) {
+                    console.log(response)
+                } else {
             req.session.access_token = response.data.access_token
             req.session.refresh_token = response.data.refresh_token
             const date = new Date()
@@ -175,7 +178,7 @@ app.get('/callback', (req, res) => {
                 }
             })
             res.redirect('/?loggedin=yes')
-        }).catch(function (error) {
+        }}).catch(function (error) {
             console.log(error.data)
         })
     }
@@ -241,6 +244,7 @@ function tracksMetadataApiCall (req, res, next) {
 app.get('/mytoptracks', validAccessToken, topTracksApiCall, tracksMetadataApiCall, (req, res, next) => {
     const trackIdsArray = []
     if (req.session.songArray === undefined || req.session.songArray === null) {
+        console.log('failure in top tracks')
         res.status(404).send()
     } else {
     req.session.songArray?.forEach((item) => {
@@ -464,6 +468,9 @@ app.get('/advancedsearch', validAccessToken, (req, res) => {
                     }
                 })
                     .then((response) => {
+                        if (response !== 200) {
+                            console.log(response)
+                        } else {
                         const songArray = []
                         if (response.data.tracks.total === 0) {
                             res.status(204).send()
@@ -512,7 +519,7 @@ app.get('/advancedsearch', validAccessToken, (req, res) => {
                             })
                         }
 
-                    })
+                    }})
             }
         })
 
