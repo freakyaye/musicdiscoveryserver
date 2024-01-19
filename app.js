@@ -53,6 +53,7 @@ function validAccessToken(req, res, next) {
         next()
     } else {
         res.status(403).send()
+        console.log('access token issue')
     }
 }
 
@@ -63,7 +64,6 @@ function checkTokenExpiry(req) {
     const elapsedTimeSec = Math.floor(elapsedTimeMs/1000)
     if (elapsedTimeSec > 3500) {
         const authString = new Buffer.from(client_id + ':' + client_secret).toString('base64')
-        console.log(req.session.refresh_token)
         try {
             axios.post('https://accounts.spotify.com/api/token', {
                 grant_type: 'refresh_token',
@@ -166,7 +166,7 @@ app.get('/callback', (req, res) => {
             optionsObject,
             axiosConfig).then(function (response) {
                 if (response.status !== 200) {
-                    console.log(response.data)
+                    console.log(response)
                 } else {
             req.session.access_token = response.data.access_token
             req.session.refresh_token = response.data.refresh_token
@@ -469,7 +469,7 @@ app.get('/advancedsearch', validAccessToken, (req, res) => {
                 })
                     .then((response) => {
                         if (response.status !== 200) {
-                            console.log(response.data)
+                            console.log(response)
                         } else {
                         const songArray = []
                         if (response.data.tracks.total === 0) {
