@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6050c161-289b-4d11-a143-6b786c1d6547" name="Changes" comment="added additional error logging" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2a7Coa6oN6akXxw6nxNlRh6zsbf" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Node.js.app.js.executor": "Run",
+    "Node.js.trackInfoFunctions.mjs.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/joeld/WebstormProjects/musicdiscoveryserver",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "ts.external.directory.path": "C:\\Users\\joeld\\AppData\\Local\\Programs\\WebStorm\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6050c161-289b-4d11-a143-6b786c1d6547" name="Changes" comment="" />
+      <created>1703660405809</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1703660405809</updated>
+      <workItem from="1703660406893" duration="202000" />
+      <workItem from="1703661345235" duration="14927000" />
+      <workItem from="1703890094590" duration="21315000" />
+      <workItem from="1703933045608" duration="2533000" />
+      <workItem from="1704069675088" duration="21716000" />
+      <workItem from="1704164631892" duration="10322000" />
+      <workItem from="1704183736491" duration="554000" />
+      <workItem from="1704184309233" duration="202000" />
+      <workItem from="1704319757173" duration="22902000" />
+      <workItem from="1704437783439" duration="3040000" />
+      <workItem from="1704514628092" duration="965000" />
+      <workItem from="1704667571410" duration="5444000" />
+      <workItem from="1704695218092" duration="26000" />
+      <workItem from="1704697993594" duration="600000" />
+      <workItem from="1704929477353" duration="3704000" />
+      <workItem from="1705101994179" duration="15824000" />
+      <workItem from="1705271686950" duration="19572000" />
+      <workItem from="1705306992838" duration="65000" />
+      <workItem from="1705307072798" duration="18000" />
+      <workItem from="1705372774994" duration="14915000" />
+      <workItem from="1705400487326" duration="1299000" />
+      <workItem from="1705453398963" duration="18745000" />
+      <workItem from="1705523895740" duration="16047000" />
+      <workItem from="1705549228353" duration="928000" />
+      <workItem from="1705551670905" duration="599000" />
+      <workItem from="1705552683443" duration="1118000" />
+      <workItem from="1705553898641" duration="2895000" />
+      <workItem from="1705558903484" duration="1738000" />
+      <workItem from="1705560988265" duration="885000" />
+      <workItem from="1705566863254" duration="790000" />
+      <workItem from="1705644556514" duration="1141000" />
+    </task>
+    <task id="LOCAL-00001" summary="First working alpha, OAuth2 is OK and top tracks GET is OK">
+      <option name="closed" value="true" />
+      <created>1703676680987</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1703676680987</updated>
+    </task>
+    <task id="LOCAL-00002" summary="changed global variables to session storage, added next() for route which requires multiple endpoints. currently adding track metadata to tracks array.">
+      <option name="closed" value="true" />
+      <created>1703935492035</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1703935492035</updated>
+    </task>
+    <task id="LOCAL-00003" summary="finished tracks metadata, finished advanced search">
+      <option name="closed" value="true" />
+      <created>1704095453027</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1704095453027</updated>
+    </task>
+    <task id="LOCAL-00004" summary="finished single song search">
+      <option name="closed" value="true" />
+      <created>1704182294086</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1704182294086</updated>
+    </task>
+    <task id="LOCAL-00005" summary="finished single song search">
+      <option name="closed" value="true" />
+      <created>1704183842159</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1704183842159</updated>
+    </task>
+    <task id="LOCAL-00006" summary="changed req.session to store2 for state and access token storage">
+      <option name="closed" value="true" />
+      <created>1704356602447</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1704356602447</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Changed artwork array choice for higher quality album image">
+      <option name="closed" value="true" />
+      <created>1704449205803</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1704449205803</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Added and completed savePlaylist route">
+      <option name="closed" value="true" />
+      <created>1705147986845</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1705147986845</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Updated multiple routes for better error handling">
+      <option name="closed" value="true" />
+      <created>1705306898577</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1705306898577</updated>
+    </task>
+    <task id="LOCAL-00010" summary="added middleware to check access token exists to avoid login attempts after logout. latest build in Public folder">
+      <option name="closed" value="true" />
+      <created>1705389679783</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1705389679783</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Added refresh tokens">
+      <option name="closed" value="true" />
+      <created>1705470182871</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1705470182871</updated>
+    </task>
+    <task id="LOCAL-00012" summary="updated package json build and run scripts">
+      <option name="closed" value="true" />
+      <created>1705476104315</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1705476104315</updated>
+    </task>
+    <task id="LOCAL-00013" summary="added some error handling for users using development without being in spotify dev console. Added some error handling for users without top tracks">
+      <option name="closed" value="true" />
+      <created>1705551727674</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1705551727674</updated>
+    </task>
+    <task id="LOCAL-00014" summary="changed margin on card details">
+      <option name="closed" value="true" />
+      <created>1705552801768</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1705552801768</updated>
+    </task>
+    <task id="LOCAL-00015" summary="change to package json">
+      <option name="closed" value="true" />
+      <created>1705554425134</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1705554425134</updated>
+    </task>
+    <task id="LOCAL-00016" summary="change to package json">
+      <option name="closed" value="true" />
+      <created>1705554631849</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1705554631849</updated>
+    </task>
+    <task id="LOCAL-00017" summary="change to package json">
+      <option name="closed" value="true" />
+      <created>1705554893153</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1705554893153</updated>
+    </task>
+    <task id="LOCAL-00018" summary="change to package json">
+      <option name="closed" value="true" />
+      <created>1705555296332</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1705555296332</updated>
+    </task>
+    <task id="LOCAL-00019" summary="change to package json">
+      <option name="closed" value="true" />
+      <created>1705555763484</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1705555763484</updated>
+    </task>
+    <task id="LOCAL-00020" summary="change to package json">
+      <option name="closed" value="true" />
+      <created>1705555829306</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1705555829306</updated>
+    </task>
+    <task id="LOCAL-00021" summary="change to package json">
+      <option name="closed" value="true" />
+      <created>1705558912560</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1705558912560</updated>
+    </task>
+    <task id="LOCAL-00022" summary="change to package json">
+      <option name="closed" value="true" />
+      <created>1705559620289</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1705559620289</updated>
+    </task>
+    <task id="LOCAL-00023" summary="changes to frontend build">
+      <option name="closed" value="true" />
+      <created>1705559755389</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1705559755389</updated>
+    </task>
+    <task id="LOCAL-00024" summary="added additional error logging">
+      <option name="closed" value="true" />
+      <created>1705645477779</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1705645477779</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="First working alpha, OAuth2 is OK and top tracks GET is OK" />
+    <MESSAGE value="changed global variables to session storage, added next() for route which requires multiple endpoints. currently adding track metadata to tracks array." />
+    <MESSAGE value="finished tracks metadata, finished advanced search" />
+    <MESSAGE value="finished single song search" />
+    <MESSAGE value="changed req.session to store2 for state and access token storage" />
+    <MESSAGE value="Changed artwork array choice for higher quality album image" />
+    <MESSAGE value="Added and completed savePlaylist route" />
+    <MESSAGE value="Updated multiple routes for better error handling" />
+    <MESSAGE value="added middleware to check access token exists to avoid login attempts after logout. latest build in Public folder" />
+    <MESSAGE value="Added refresh tokens" />
+    <MESSAGE value="updated package json build and run scripts" />
+    <MESSAGE value="added some error handling for users using development without being in spotify dev console. Added some error handling for users without top tracks" />
+    <MESSAGE value="changed margin on card details" />
+    <MESSAGE value="change to package json" />
+    <MESSAGE value="changes to frontend build" />
+    <MESSAGE value="added additional error logging" />
+    <option name="LAST_COMMIT_MESSAGE" value="added additional error logging" />
+  </component>
+</project>
