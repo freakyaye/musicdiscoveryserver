@@ -165,7 +165,7 @@ app.get('/callback', (req, res) => {
         const response = axios.post('https://accounts.spotify.com/api/token',
             optionsObject,
             axiosConfig).then(function (response) {
-                if (response !== 200) {
+                if (response.status !== 200) {
                     console.log(response)
                 } else {
             req.session.access_token = response.data.access_token
@@ -468,7 +468,7 @@ app.get('/advancedsearch', validAccessToken, (req, res) => {
                     }
                 })
                     .then((response) => {
-                        if (response !== 200) {
+                        if (response.status !== 200) {
                             console.log(response)
                         } else {
                         const songArray = []
