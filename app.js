@@ -86,7 +86,7 @@ function checkTokenExpiry(req) {
                     })
                     return true
                 } else if (response.status !== 200) {
-                    console.error(response)
+                    console.log(response.data)
                     return false
                 }
             })
@@ -166,7 +166,7 @@ app.get('/callback', (req, res) => {
             optionsObject,
             axiosConfig).then(function (response) {
                 if (response.status !== 200) {
-                    console.log(response)
+                    console.log(response.data)
                 } else {
             req.session.access_token = response.data.access_token
             req.session.refresh_token = response.data.refresh_token
@@ -469,7 +469,7 @@ app.get('/advancedsearch', validAccessToken, (req, res) => {
                 })
                     .then((response) => {
                         if (response.status !== 200) {
-                            console.log(response)
+                            console.log(response.data)
                         } else {
                         const songArray = []
                         if (response.data.tracks.total === 0) {
